@@ -1,13 +1,37 @@
-// Create web serve
+// Create web server
+const express = require('express');
+const app = express();
+app.use(express.json());
 
-var express = require('express');
-var router = express.Router();
-var commentController = require('../controllers/commentController');
+// Create web server
+const http = require('http');
+const server = http.createServer(app);
 
-/* GET users listing. */
-router.post('/create', commentController.createComment);
-router.get('/list', commentController.listComment);
-router.put('/update/:id', commentController.updateComment);
-router.delete('/delete/:id', commentController.deleteComment);
+// Create socket server
+const socketIo = require('socket.io');
+const io = socketIo(server);
 
-module.exports = router;
+// Create comments array
+const comments = [
+    { id: 1, author: 'John', content: 'Hello, World!' },
+    { id: 2, author: 'Jane', content: 'Hi, there!' },
+];
+
+// Handle GET request
+app.get('/comments', (req, res) => {
+    res.send(comments);
+});
+
+// Handle POST request
+app.post('/comments', (req, res) => {
+    const comment = req.body;
+    comments.push(comment);
+    io.emit('new-comment', comment);
+    res.send(comment);
+});
+
+// Start server
+const PORT = 3000;
+server.listen(PORT, () => {
+    console.log(`Server is running on http://localhost:${PORT}`);
+});
