@@ -1,39 +1,34 @@
 // Create web serve
-// 1. import express
-// 2. create an express instance
-// 3. create the first route
-// 4. start the server
 
+// Import express
 const express = require('express');
-const app = express();
-const port = 3000;
+const router = express.Router();
+const { Comment } = require('../models/Comment');
 
-app.get('/', (req, res) => {
-  res.send('Hello World');
+//=================================
+//             Comments
+//=================================
+
+router.post('/saveComment', (req, res) => {
+    const comment = new Comment(req.body);
+    comment.save((err, comment) => {
+        if (err) return res.json({ success: false, err })
+        Comment.find({ '_id': comment._id })
+            .populate('writer')
+            .exec((err, result) => {
+                if (err) return res.json({ success: false, err })
+                return res.status(200).json({ success: true, result })
+            })
+    })
 });
 
-app.listen(port, () => {
-  console.log(`Server is running on port ${port}`);
+router.post('/getComments', (req, res) => {
+    Comment.find({ 'postId': req.body.videoId })
+        .populate('writer')
+        .exec((err, comments) => {
+            if (err) return res.json({ success: false, err })
+            return res.status(200).json({ success: true, comments })
+        })
 });
 
-// 5. test the server
-// run the server by running node comments.js
-// go to a browser and type localhost:3000
-// you should see Hello World
-
-// 6. create a route that returns a list of comments
-app.get('/comments', (req, res) => {
-  res.json([
-    { id: 1, author: 'John Doe', body: 'This is a comment' },
-    { id: 2, author: 'Jane Doe', body: 'This is another comment' },
-  ]);
-});
-
-// 7. test the comments route
-// go to a browser and type localhost:3000/comments
-// you should see the list of comments
-
-// 8. create a route that returns a single comment
-app.get('/comments/:id', (req, res) => {
-  const comment = {
-    id: 1,
+module.exports = router;
