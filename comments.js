@@ -1,19 +1,41 @@
 // creat web serve
+const express = require('express');
+const app = express();
+const port = 3000;
 
-var http = require('http');
-var url = require('url');
-var fs = require('fs');
+// get comments
+app.get('/comments', (req, res) => {
+    res.send('GET comments!');
+});
 
-http.createServer(function (req, res) {
-  var q = url.parse(req.url, true);
-  var filename = "." + q.pathname;
-  fs.readFile(filename, function(err, data) {
-    if (err) {
-      res.writeHead(404, {'Content-Type': 'text/html'});
-      return res.end("404 Not Found");
-    }
-    res.writeHead(200, {'Content-Type': 'text/html'});
-    res.write(data);
-    return res.end();
-  });
-}).listen(8080);
+// post comments
+app.post('/comments', (req, res) => {
+    res.send('POST comments!');
+});
+
+// put comments
+app.put('/comments', (req, res) => {
+    res.send('PUT comments!');
+});
+
+// delete comments
+app.delete('/comments', (req, res) => {
+    res.send('DELETE comments!');
+});
+
+app.listen(port, () => {
+    console.log(`Server is running on port ${port}`);
+});
+
+// run the server
+// node comments.js
+// Server is running on port 3000
+
+// GET comments!
+// POST comments!
+// PUT comments!
+// DELETE comments!
+// GET comments!
+// POST comments!
+// PUT comments!
+// DELETE comments!
